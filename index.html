@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda Control</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+  color: #222;
+}
+
+header {
+  background: #6d28d9;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  justify-content: center;
+  box-shadow: 0 2px 5px #ccc;
+}
+
+nav button {
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #ede9fe;
+  color: #4c1d95;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+nav button:hover {
+  background: #c4b5fd;
+}
+
+main {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+section {
+  display: none;
+}
+
+section.active {
+  display: block;
+}
+
+.card {
+  background: white;
+  padding: 18px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #ddd;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 15px;
+}
+
+.metric {
+  background: #fff;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #ddd;
+}
+
+.metric h3 {
+  margin: 0 0 10px;
+  color: #6d28d9;
+}
+
+.metric strong {
+  font-size: 24px;
+}
+
+form {
+  display: grid;
+  gap: 10px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  font-size: 15px;
+}
+
+button.primary {
+  background: #6d28d9;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button.danger {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button.success {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #64748b;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  min-width: 650px;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background: #ede9fe;
+  color: #4c1d95;
+}
+
+.badge {
+  padding: 5px 8px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.paid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.pending {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.blacklisted {
+  background: #111827;
+  color: white;
+}
+
+.empty {
+  padding: 15px;
+  color: #777;
+  text-align: center;
+}
+
+.row-buttons {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 20px 0;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Agenda Control</h1>
+  <p>Materiales, clientes, ventas, pagos y ganancias</p>
+</header>
+
+<nav>
+  <button onclick="mostrarSeccion('inicio')">Inicio</button>
+  <button onclick="mostrarSeccion('materiales')">Materiales</button>
+  <button onclick="mostrarSeccion('clientes')">Clientes</button>
+  <button onclick="mostrarSeccion('ventas')">Ventas</button>
+  <button onclick="mostrarSeccion('pagos')">Pagos</button>
+  <button onclick="mostrarSeccion('morosos')">Lista negra</button>
+</nav>
+
+<main>
+
+<section id="inicio" class="active">
+  <h2>Resumen del negocio</h2>
+
+  <div class="cards">
+    <div class="metric">
+      <h3>Total vendido</h3>
+      <strong id="totalVendido">$0</strong>
+    </div>
+
+    <div class="metric">
+      <h3>Costos</h3>
+      <strong id="totalCostos">$0</strong>
+    </div>
+
+    <div class="metric">
+      <h3>Ganancia</h3>
+      <strong id="ganancia">$0</strong>
+    </div>
+
+    <div class="metric">
+      <h3>Ventas</h3>
+      <strong id="cantidadVentas">0</strong>
+    </div>
+
+    <div class="metric">
+      <h3>Efectivo</h3>
+      <strong id="totalEfectivo">$0</strong>
+    </div>
+
+    <div class="metric">
+      <h3>Transferencias</h3>
+      <strong id="totalTransferencias">$0</strong>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Consejo</h3>
+    <p>Registra cada venta y cada pago para conocer cuánto ganas y quién tiene pagos pendientes.</p>
+  </div>
+</section>
+
+<section id="materiales">
+  <h2>Materiales</h2>
+
+  <div class="card">
+    <form id="formMaterial">
+      <input id="materialNombre" placeholder="Nombre del material" required>
+      <input id="materialCosto" type="number" min="0" step="1" placeholder="Costo por unidad" required>
+      <input id="materialStock" type="number" min="0" placeholder="Cantidad comprada" required>
+      <button class="primary">Guardar material</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Costo unitario</th>
+          <th>Stock</th>
+          <th>Valor total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaMateriales"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="clientes">
+  <h2>Clientes</h2>
+
+  <div class="card">
+    <form id="formCliente">
+      <input id="clienteNombre" placeholder="Nombre del cliente" required>
+      <input id="clienteTelefono" placeholder="Teléfono">
+      <input id="clienteCorreo" type="email" placeholder="Correo electrónico">
+      <button class="primary">Guardar cliente</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Teléfono</th>
+          <th>Correo</th>
+          <th>Compras</th>
+          <th>Total comprado</th>
+          <th>Pagado</th>
+          <th>Deuda</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaClientes"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="ventas">
+  <h2>Ventas</h2>
+
+  <div class="card">
+    <form id="formVenta">
+      <select id="ventaCliente" required></select>
+      <input id="ventaProducto" placeholder="Producto o tipo de agenda" required>
+      <input id="ventaCantidad" type="number" min="1" placeholder="Cantidad" required>
+      <input id="ventaPrecio" type="number" min="0" step="1" placeholder="Precio de venta unitario" required>
+      <input id="ventaCosto" type="number" min="0" step="1" placeholder="Costo unitario" required>
+
+      <select id="ventaPago">
+        <option value="Efectivo">Efectivo</option>
+        <option value="Transferencia">Transferencia</option>
+        <option value="Pendiente">Pendiente</option>
+      </select>
+
+      <button class="primary">Guardar venta</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Total</th>
+          <th>Costo</th>
+          <th>Ganancia</th>
+          <th>Pago</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaVentas"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="pagos">
+  <h2>Registrar pagos</h2>
+
+  <div class="card">
+    <form id="formPago">
+      <select id="pagoCliente" required></select>
+      <input id="pagoMonto" type="number" min="0" step="1" placeholder="Monto pagado" required>
+
+      <select id="pagoMetodo">
+        <option value="Efectivo">Efectivo</option>
+        <option value="Transferencia">Transferencia</option>
+      </select>
+
+      <textarea id="pagoNota" placeholder="Nota del pago"></textarea>
+      <button class="primary">Guardar pago</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Monto</th>
+          <th>Método</th>
+          <th>Nota</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaPagos"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="morosos">
+  <h2>Lista negra de clientes</h2>
+
+  <div class="card">
+    <p>Los clientes aparecen aquí cuando tienen deuda pendiente o cuando los agregas manualmente.</p>
+  </div>
+
+  <div class="card table-conta
