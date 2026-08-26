@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mago-Lector: Agenda Mágica</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(135deg, #1e1b4b, #3b0764, #581c87);
+  color: #f3e8ff;
+  min-height: 100vh;
+}
+
+header {
+  background: rgba(15, 5, 29, 0.85);
+  border-bottom: 3px solid #fbbf24;
+  color: #fde047;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
+}
+
+header h1 {
+  font-family: 'Cinzel', serif;
+  margin: 0;
+  font-size: 2.5rem;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+}
+
+header p {
+  margin: 5px 0 0;
+  color: #e9d5ff;
+  font-style: italic;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 15px;
+  background: rgba(30, 27, 75, 0.9);
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  border-bottom: 2px solid #a855f7;
+}
+
+nav button {
+  border: 2px solid #d8b4fe;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: #581c87;
+  color: #f3e8ff;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: 'Quicksand', sans-serif;
+  transition: all 0.3s ease;
+}
+
+nav button:hover {
+  background: #fbbf24;
+  color: #3b0764;
+  border-color: #fbbf24;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #fbbf24;
+}
+
+main {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+section {
+  display: none;
+}
+
+section.active {
+  display: block;
+}
+
+h2 {
+  font-family: 'Cinzel', serif;
+  color: #fde047;
+  border-bottom: 2px dashed #a855f7;
+  padding-bottom: 8px;
+}
+
+.card {
+  background: rgba(45, 27, 105, 0.8);
+  border: 2px solid #a855f7;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 15px;
+}
+
+.metric {
+  background: linear-gradient(145deg, #3b0764, #4c1d95);
+  border: 2px solid #fbbf24;
+  padding: 18px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
+  text-align: center;
+}
+
+.metric h3 {
+  margin: 0 0 10px;
+  color: #fde047;
+  font-size: 1rem;
+}
+
+.metric strong {
+  font-size: 22px;
+  color: #ffffff;
+}
+
+form {
+  display: grid;
+  gap: 12px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #c084fc;
+  background: rgba(20, 10, 40, 0.9);
+  color: white;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: 'Quicksand', sans-serif;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #fbbf24;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+}
+
+button.primary {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: #3b0764;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  font-family: 'Cinzel', serif;
+  transition: transform 0.2s;
+}
+
+button.primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 15px #fbbf24;
+}
+
+button.danger {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(20, 10, 40, 0.9);
+  min-width: 650px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #581c87;
+  text-align: left;
+}
+
+th {
+  background: #581c87;
+  color: #fde047;
+  font-family: 'Cinzel', serif;
+}
+
+.badge {
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.paid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.pending {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.empty {
+  padding: 15px;
+  color: #d8b4fe;
+  text-align: center;
+  font-style: italic;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>✨ Mago-Lector ✨</h1>
+  <p>Reino Mágico: Materiales, clientes, ventas, pagos y ganancias</p>
+</header>
+
+<nav>
+  <button type="button" onclick="mostrarSeccion('inicio')">🏰 Inicio</button>
+  <button type="button" onclick="mostrarSeccion('materiales')">📜 Materiales</button>
+  <button type="button" onclick="mostrarSeccion('clientes')">👑 Clientes</button>
+  <button type="button" onclick="mostrarSeccion('ventas')">🪄 Ventas</button>
+  <button type="button" onclick="mostrarSeccion('pagos')">✨ Pagos</button>
+  <button type="button" onclick="mostrarSeccion('morosos')">⚡ Lista Negra</button>
+</nav>
+
+<main>
+
+<section id="inicio" class="active">
+  <h2>Resumen del Reino</h2>
+
+  <div class="cards">
+    <div class="metric">
+      <h3>Total vendido</h3>
+      <strong id="totalVendido">$0</strong>
+    </div>
+    <div class="metric">
+      <h3>Costos</h3>
+      <strong id="totalCostos">$0</strong>
+    </div>
+    <div class="metric">
+      <h3>Ganancia</h3>
+      <strong id="ganancia">$0</strong>
+    </div>
+    <div class="metric">
+      <h3>Ventas</h3>
+      <strong id="cantidadVentas">0</strong>
+    </div>
+    <div class="metric">
+      <h3>Efectivo</h3>
+      <strong id="totalEfectivo">$0</strong>
+    </div>
+    <div class="metric">
+      <h3>Transferencias</h3>
+      <strong id="totalTransferencias">$0</strong>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 20px;">
+    <h3>🔮 Hechizo de Gestión</h3>
+    <p>Registra cada encantamiento de venta y cada ofrenda de pago para mantener tu reino próspero y feliz por siempre.</p>
+  </div>
+</section>
+
+<section id="materiales">
+  <h2>Materiales Mágicos</h2>
+  <div class="card">
+    <form id="formMaterial">
+      <input id="materialNombre" placeholder="Nombre del material" required>
+      <input id="materialCosto" type="number" min="0" step="1" placeholder="Costo por unidad" required>
+      <input id="materialStock" type="number" min="0" placeholder="Cantidad comprada" required>
+      <button class="primary" type="submit">Guardar material</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Costo unitario</th>
+          <th>Stock</th>
+          <th>Valor total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaMateriales"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="clientes">
+  <h2>Súbditos y Clientes</h2>
+  <div class="card">
+    <form id="formCliente">
+      <input id="clienteNombre" placeholder="Nombre del cliente" required>
+      <input id="clienteTelefono" placeholder="Teléfono">
+      <input id="clienteCorreo" type="email" placeholder="Correo electrónico">
+      <button class="primary" type="submit">Guardar cliente</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Teléfono</th>
+          <th>Correo</th>
+          <th>Compras</th>
+          <th>Total comprado</th>
+          <th>Pagado</th>
+          <th>Deuda</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaClientes"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="ventas">
+  <h2>Registro de Ventas</h2>
+  <div class="card">
+    <form id="formVenta">
+      <select id="ventaCliente" required></select>
+      <input id="ventaProducto" placeholder="Producto o tipo de agenda" required>
+      <input id="ventaCantidad" type="number" min="1" placeholder="Cantidad" required>
+      <input id="ventaPrecio" type="number" min="0" step="1" placeholder="Precio de venta unitario" required>
+      <input id="ventaCosto" type="number" min="0" step="1" placeholder="Costo unitario" required>
+
+      <select id="ventaPago">
+        <option value="Efectivo">Efectivo</option>
+        <option value="Transferencia">Transferencia</option>
+        <option value="Pendiente">Pendiente</option>
+      </select>
+
+      <button class="primary" type="submit">Guardar venta</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Total</th>
+          <th>Costo</th>
+          <th>Ganancia</th>
+          <th>Pago</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaVentas"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="pagos">
+  <h2>Cámara de Pagos</h2>
+  <div class="card">
+    <form id="formPago">
+      <select id="pagoCliente" required></select>
+      <input id="pagoMonto" type="number" min="0" step="1" placeholder="Monto pagado" required>
+
+      <select id="pagoMetodo">
+        <option value="Efectivo">Efectivo</option>
+        <option value="Transferencia">Transferencia</option>
+      </select>
+
+      <textarea id="pagoNota" placeholder="Nota del pago"></textarea>
+      <button class="primary" type="submit">Guardar pago</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Monto</th>
+          <th>Método</th>
+          <th>Nota</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaPagos"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="morosos">
+  <h2>Lista Negra del Villano</h2>
+  <div class="card">
+    <p>Los clientes aparecen aquí automáticamente cuando tienen deudas pendientes.</p>
+  </div>
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Deuda Pendiente</th>
+          <th>Contacto</th>
+        </tr>
+      </thead>
+      <tbody id="tablaMorosos"></tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<script>
+let datos = JSON.parse(localStorage.getItem('mago_lector_data')) || {
+  materiales: [],
+  clientes: [],
+  ventas: [],
+  pagos: []
+};
+
+function guardarDatos() {
+  localStorage.setItem('mago_lector_data', JSON.stringify(datos));
+  actualizarTodo();
+}
+
+function mostrarSeccion(id) {
+  document.querySelectorAll('main section').forEach(sec => sec.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('formMaterial').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('materialNombre').value;
+    const costo = parseFloat(document.getElementById('materialCosto').value);
+    const stock = parseInt(document.getElementById('materialStock').value);
+    datos.materiales.push({ id: Date.now(), nombre, costo, stock });
+    this.reset();
+    guardarDatos();
+  });
+
+  document.getElementById('formCliente').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('clienteNombre').value;
+    const telefono = document.getElementById('clienteTelefono').value;
+    const correo = document.getElementById('clienteCorreo').value;
+    datos.clientes.push({ id: Date.now(), nombre, telefono, correo });
+    this.reset();
+    guardarDatos();
+  });
+
+  document.getElementById('formVenta').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const cliente = document.getElementById('ventaCliente').value;
+    const producto = document.getElementById('ventaProducto').value;
+    const cantidad = parseInt(document.getElementById('ventaCantidad').value);
+    const precio = parseFloat(document.getElementById('ventaPrecio').value);
+    const costo = parseFloat(document.getElementById('ventaCosto').value);
+    const pago = document.getElementById('ventaPago').value;
+    const fecha = new Date().toLocaleDateString();
+    datos.ventas.push({ id: Date.now(), fecha, cliente, producto, cantidad, precio, costo, pago });
+    this.reset();
+    guardarDatos();
+  });
+
+  document.getElementById('formPago').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const cliente = document.getElementById('pagoCliente').value;
+    const monto = parseFloat(document.getElementById('pagoMonto').value);
+    const metodo = document.getElementById('pagoMetodo').value;
+    const nota = document.getElementById('pagoNota').value;
+    const fecha = new Date().toLocaleDateString();
+    datos.pagos.push({ id: Date.now(), fecha, cliente, monto, metodo, nota });
+    this.reset();
+    guardarDatos();
+  });
+
+  actualizarTodo();
+});
+
+function eliminarMaterial(id) {
+  datos.materiales = datos.materiales.filter(m => m.id !== id);
+  guardarDatos();
+}
+
+function eliminarCliente(id) {
+  datos.clientes = datos.clientes.filter(c => c.id !== id);
+  guardarDatos();
+}
+
+function eliminarVenta(id) {
+  datos.ventas = datos.ventas.filter(v => v.id !== id);
+  guardarDatos();
+}
+
+function eliminarPago(id) {
+  datos.pagos = datos.pagos.filter(p => p.id !== id);
+  guardarDatos();
+}
+
+function actualizarTodo() {
+  const selectVentaCliente = document.getElementById('ventaCliente');
+  const selectPagoCliente = document.getElementById('pagoCliente');
+  selectVentaCliente.innerHTML = '';
+  selectPagoCliente.innerHTML = '';
+
+  if (datos.clientes.length === 0) {
+    selectVentaCliente.innerHTML = '<option value="">Primero agrega un cliente</option>';
+    selectPagoCliente.innerHTML = '<option value="">Primero agrega un cliente</option>';
+  } else {
+    datos.clientes.forEach(c => {
+      selectVentaCliente.innerHTML += `<option value="${c.nombre}">${c.nombre}</option>`;
+      selectPagoCliente.innerHTML += `<option value="${c.nombre}">${c.nombre}</option>`;
+    });
+  }
+
+  let htmlMat = '';
+  let totalCostosMat = 0;
+  if(datos.materiales.length === 0) {
+    htmlMat = `<tr><td colspan="5" class="empty">No hay materiales en el grimorio.</td></tr>`;
+  } else {
+    datos.materiales.forEach(m => {
+      let valorTotal = m.costo * m.stock;
+      totalCostosMat += valorTotal;
+      htmlMat += `<tr>
+        <td>${m.nombre}</td>
+        <td>$${m.costo}</td>
+        <td>${m.stock}</td>
+        <td>$${valorTotal}</td>
+        <td><button type="button" class="danger" onclick="eliminarMaterial(${m.id})">Eliminar</button></td>
+      </tr>`;
+    });
+  }
+  document.getElementById('tablaMateriales').innerHTML = htmlMat;
+
+  let totalVendido = 0;
+  let totalCostosVentas = 0;
+  let totalEfectivo = 0;
+  let totalTransferencias = 0;
+  let htmlVentas = '';
+
+  if(datos.ventas.length === 0) {
+    htmlVentas = `<tr><td colspan="9" class="empty">No hay ventas registradas.</td></tr>`;
+  } else {
+    datos.ventas.forEach(v => {
+      let totalV = v.cantidad * v.precio;
+      let totalC = v.cantidad * v.costo;
+      let gananciaV = totalV - totalC;
+
+      totalVendido += totalV;
+      totalCostosVentas += totalC;
+
+      if(v.pago === 'Efectivo') totalEfectivo += totalV;
+      if(v.pago === 'Transferencia') totalTransferencias += totalV;
+
+      htmlVentas += `<tr>
+        <td>${v.fecha}</td>
+        <td>${v.cliente}</td>
+        <td>${v.producto}</td>
+        <td>${v.cantidad}</td>
+        <td>$${totalV}</td>
+        <td>$${totalC}</td>
+        <td>$${gananciaV}</td>
+        <td><span class="badge ${v.pago === 'Pendiente' ? 'pending' : 'paid'}">${v.pago}</span></td>
+        <td><button type="button" class="danger" onclick="eliminarVenta(${v.id})">Eliminar</button></td>
+      </tr>`;
+    });
+  }
+  document.getElementById('tablaVentas').innerHTML = htmlVentas;
+
+  let htmlPagos = '';
+  if(datos.pagos.length === 0) {
+    htmlPagos = `<tr><td colspan="6" class="empty">No hay pagos registrados.</td></tr>`;
+  } else {
+    datos.pagos.forEach(p => {
+      if(p.metodo === 'Efectivo') totalEfectivo += p.monto;
+      if(p.metodo === 'Transferencia') totalTransferencias += p.monto;
+
+      htmlPagos += `<tr>
+        <td>${p.fecha}</td>
+        <td>${p.cliente}</td>
+        <td>$${p.monto}</td>
+        <td>${p.metodo}</td>
+        <td>${p.nota || '-'}</td>
+        <td><button type="button" class="danger" onclick="eliminarPago(${p.id})">Eliminar</button></td>
+      </tr>`;
+    });
+  }
+  document.getElementById('tablaPagos').innerHTML = htmlPagos;
+
+  let htmlClientes = '';
+  let htmlMorosos = '';
+  if(datos.clientes.length === 0) {
+    htmlClientes = `<tr><td colspan="9" class="empty">No hay clientes en el reino.</td></tr>`;
+    htmlMorosos = `<tr><td colspan="3" class="empty">No hay morosos en la lista negra.</td></tr>`;
+  } else {
+    datos.clientes.forEach(c => {
+      let comprasCliente = datos.ventas.filter(v => v.cliente === c.nombre);
+      let totalComp = comprasCliente.reduce((acc, v) => acc + (v.cantidad * v.precio), 0);
+      
+      let pagosCliente = datos.pagos.filter(p => p.cliente === c.nombre);
+      let totalPagado = pagosCliente.reduce((acc, p) => acc + p.monto, 0);
+
+      comprasCliente.forEach(v => {
+        if(v.pago !== 'Pendiente') {
+          totalPagado += (v.cantidad * v.precio);
+        }
+      });
+
+      let deuda = totalComp - totalPagado;
+      if(deuda < 0) deuda = 0;
+
+      let estadoBadge = deuda > 0 ? '<span class="badge pending">Deudor</span>' : '<span class="badge paid">Al día</span>';
+
+      htmlClientes += `<tr>
+        <td>${c.nombre}</td>
+        <td>${c.telefono || '-'}</td>
+        <td>${c.correo || '-'}</td>
+        <td>${comprasCliente.length}</td>
+        <td>$${totalComp}</td>
+        <td>$${totalPagado}</td>
+        <td>$${deuda}</td>
+        <td>${estadoBadge}</td>
+        <td><button type="button" class="danger" onclick="eliminarCliente(${c.id})">Eliminar</button></td>
+      </tr>`;
+
+      if(deuda > 0) {
+        htmlMorosos += `<tr>
+          <td>${c.nombre}</td>
+          <td><strong style="color: #fca5a5;">$${deuda}</strong></td>
+          <td>${c.telefono || c.correo || 'Sin contacto'}</td>
+        </tr>`;
+      }
+    });
+    if(htmlMorosos === '') {
+      htmlMorosos = `<tr><td colspan="3" class="empty">¡Maravilloso! Ningún cliente tiene deudas pendientes.</td></tr>`;
+    }
+  }
+  document.getElementById('tablaClientes').innerHTML = htmlClientes;
+  document.getElementById('tablaMorosos').innerHTML = htmlMorosos;
+
+  let gananciaTotal = totalVendido - totalCostosVentas;
+  document.getElementById('totalVendido').innerText = `$${totalVendido}`;
+  document.getElementById('totalCostos').innerText = `$${totalCostosVentas}`;
+  document.getElementById('ganancia').innerText = `$${gananciaTotal}`;
+  document.getElementById('cantidadVentas').innerText = datos.ventas.length;
+  document.getElementById('totalEfectivo').innerText = `$${totalEfectivo}`;
+  document.getElementById('totalTransferencias').innerText = `$${totalTransferencias}`;
+}
+</script>
+
+</body>
+</html>
