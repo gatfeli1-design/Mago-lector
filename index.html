@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mago-Lector: Agenda Mágica</title>
+
+<!-- Permite instalar la app en el escritorio del celular -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3b0764">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mago-Lector">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(135deg, #1e1b4b, #3b0764, #581c87);
+  color: #f3e8ff;
+  min-height: 100vh;
+}
+
+header {
+  background: rgba(15, 5, 29, 0.85);
+  border-bottom: 3px solid #fbbf24;
+  color: #fde047;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
+}
+
+header h1 {
+  font-family: 'Cinzel', serif;
+  margin: 0;
+  font-size: 2.5rem;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+}
+
+header p {
+  margin: 5px 0 0;
+  color: #e9d5ff;
+  font-style: italic;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 15px;
+  background: rgba(30, 27, 75, 0.9);
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  border-bottom: 2px solid #a855f7;
+}
+
+nav button {
+  border: 2px solid #d8b4fe;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: #581c87;
+  color: #f3e8ff;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: 'Quicksand', sans-serif;
+  transition: all 0.3s ease;
+}
+
+nav button:hover {
+  background: #fbbf24;
+  color: #3b0764;
+  border-color: #fbbf24;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #fbbf24;
+}
+
+main {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+section {
+  display: none;
+}
+
+section.active {
+  display: block;
+}
+
+h2 {
+  font-family: 'Cinzel', serif;
+  color: #fde047;
+  border-bottom: 2px dashed #a855f7;
+  padding-bottom: 8px;
+}
+
+.card {
+  background: rgba(45, 27, 105, 0.8);
+  border: 2px solid #a855f7;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 15px;
+}
+
+.metric {
+  background: linear-gradient(145deg, #3b0764, #4c1d95);
+  border: 2px solid #fbbf24;
+  padding: 18px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
+  text-align: center;
+}
+
+.metric h3 {
+  margin: 0 0 10px;
+  color: #fde047;
+  font-size: 1rem;
+}
+
+.metric strong {
+  font-size: 22px;
+  color: #ffffff;
+}
+
+form {
+  display: grid;
+  gap: 12px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #c084fc;
+  background: rgba(20, 10, 40, 0.9);
+  color: white;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: 'Quicksand', sans-serif;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #fbbf24;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+}
+
+button.primary {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: #3b0764;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  font-family: 'Cinzel', serif;
+  transition: transform 0.2s;
+}
+
+button.primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 15px #fbbf24;
+}
+
+button.danger {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(20, 10, 40, 0.9);
+  min-width: 650px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #581c87;
+  text-align: left;
+}
+
+th {
+  background: #581c87;
+  color: #fde047;
+  font-family: 'Cinzel', serif;
+}
+
+.badge {
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.paid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.pending {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.empty {
+  padding: 15px;
+  color: #d8b4fe;
+  text-align: center;
+  font-style: italic;
+}
+
+#instalarBtn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: #3b0764;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 30px;
+  font-weight: bold;
+  font-family: 'Cinzel', serif;
+  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.5);
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>✨ Mago-Lector ✨</h1>
+  <p>Reino Mágico: Materiales, clientes, ventas, pagos y ganancias</p>
+</header>
+
+<nav>
+  <button type="button" onclick="mostrarSeccion('inicio')">🏰 Inicio</button>
+  <button type="button" onclick="mostrarSeccion('materiales')">📜 Materiales</button>
+  <button type="button" onclick="mostrarSeccion('clientes')">👑 Clientes</button>
+  <button type="button" onclick="mostrarSeccion('ventas')">🪄 Ventas</button>
+  <button type="button" onclick="mostrarSeccion('pagos')">✨ Pagos</button>
+  <button type="button" onclick="mostrarSeccion('productos')">🧪 Recetario</button>
+  <button type="button" onclick="mostrarSeccion('historial')">📊 Historial</button>
+  <button type="button" onclick="mostrarSeccion('morosos')">⚡ Lista Negra</button>
+</nav>
+
+<main>
+
+<section id="inicio" class="active">
+  <h2>Resumen del Reino</h2>
+
+  <div class="cards">
+    <div class="metric">
+      <h3>Total vendido</h3>
+      <strong id="totalVendido">$0</strong>
+    </div>
+    <div class="metric">
+      <h3>Costos</h3>
+      <strong id="totalCostos">$0</strong>
+    </div>
+    <div class="metric">
+      <h3>Ganancia</h3>
+      <strong id="ganancia">$0</strong>
+    </div>
+    <div class="metric">
+      <h3>Ventas</h3>
+      <strong id="cantidadVentas">0</strong>
+    </div>
+    <div class="metric">
+      <h3>Efectivo</h3>
+      <strong id="totalEfectivo">$0</strong>
+    </div>
+    <div class="metric">
+      <h3>Transferencias</h3>
+      <strong id="totalTransferencias">$0</strong>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 20px;">
+    <h3>🔮 Hechizo de Gestión</h3>
+    <p>Registra cada encantamiento de venta y cada ofrenda de pago para mantener tu reino próspero y feliz por siempre.</p>
+  </div>
+</section>
+
+<section id="materiales">
+  <h2>Materiales Mágicos</h2>
+  <div class="card">
+    <form id="formMaterial">
+      <input id="materialNombre" placeholder="Nombre del material" required>
+      <input id="materialCosto" type="number" min="0" step="1" placeholder="Costo por unidad" required>
+      <input id="materialStock" type="number" min="0" placeholder="Cantidad comprada" required>
+      <button class="primary" type="submit">Guardar material</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Costo unitario</th>
+          <th>Stock</th>
+          <th>Valor total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaMateriales"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="clientes">
+  <h2>Súbditos y Clientes</h2>
+  <div class="card">
+    <form id="formCliente">
+      <input id="clienteNombre" placeholder="Nombre del cliente" required>
+      <input id="clienteTelefono" placeholder="Teléfono">
+      <input id="clienteCorreo" type="email" placeholder="Correo electrónico">
+      <button class="primary" type="submit">Guardar cliente</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Teléfono</th>
+          <th>Correo</th>
+          <th>Compras</th>
+          <th>Total comprado</th>
+          <th>Pagado</th>
+          <th>Deuda</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaClientes"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="ventas">
+  <h2>Registro de Ventas</h2>
+  <div class="card">
+    <form id="formVenta">
+      <select id="ventaCliente" required></select>
+
+      <select id="ventaProductoSelect" onchange="seleccionarProductoCatalogo()">
+        <option value="">-- Selecciona un producto del catálogo --</option>
+        <option value="__custom__">Producto personalizado</option>
+      </select>
+
+      <input id="ventaProducto" placeholder="Producto o tipo de agenda" required>
+      <input id="ventaCantidad" type="number" min="1" placeholder="Cantidad" required>
+      <input id="ventaPrecio" type="number" min="0" step="1" placeholder="Precio de venta unitario" required>
+      <input id="ventaCosto" type="number" min="0" step="1" placeholder="Costo unitario" required>
+
+      <select id="ventaPago">
+        <option value="Efectivo">Efectivo</option>
+        <option value="Transferencia">Transferencia</option>
+        <option value="Pendiente">Pendiente</option>
+      </select>
+
+      <button class="primary" type="submit">Guardar venta</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Total</th>
+          <th>Costo</th>
+          <th>Ganancia</th>
+          <th>Pago</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaVentas"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="pagos">
+  <h2>Cámara de Pagos</h2>
+  <div class="card">
+    <form id="formPago">
+      <select id="pagoCliente" required></select>
+      <input id="pagoMonto" type="number" min="0" step="1" placeholder="Monto pagado" required>
+
+      <select id="pagoMetodo">
+        <option value="Efectivo">Efectivo</option>
+        <option value="Transferencia">Transferencia</option>
+      </select>
+
+      <textarea id="pagoNota" placeholder="Nota del pago"></textarea>
+      <button class="primary" type="submit">Guardar pago</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Monto</th>
+          <th>Método</th>
+          <th>Nota</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaPagos"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="productos">
+  <h2>Recetario de Productos</h2>
+  <div class="card">
+    <form id="formProducto">
+      <input id="productoNombre" placeholder="Nombre del producto" required>
+
+      <div id="filasReceta"></div>
+      <button type="button" onclick="agregarFilaReceta()" style="border:2px solid #d8b4fe;padding:10px;border-radius:10px;background:#581c87;color:#f3e8ff;cursor:pointer;">+ Agregar material</button>
+
+      <input id="productoPrecioVenta" type="number" min="0" step="1" placeholder="Precio de venta" oninput="actualizarCostoEstimado()" required>
+
+      <div class="metric" style="text-align:left;">
+        <h3>Vista previa</h3>
+        <p>Costo: <strong id="previewCosto">$0</strong></p>
+        <p>Ganancia: <strong id="previewGanancia">$0</strong></p>
+        <p>Margen: <strong id="previewMargen">0%</strong></p>
+      </div>
+
+      <button class="primary" type="submit">Guardar producto</button>
+    </form>
+  </div>
+
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th><th>Receta</th><th>Costo</th><th>Precio</th><th>Ganancia</th><th>Margen</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaProductos"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="historial">
+  <h2>Historial de Compras por Cliente</h2>
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr><th>Cliente</th><th>Producto</th><th>Veces comprado</th><th>Cantidad</th><th>Total gastado</th></tr>
+      </thead>
+      <tbody id="tablaHistorial"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="morosos">
+  <h2>Lista Negra del Villano</h2>
+  <div class="card">
+    <p>Los clientes aparecen aquí automáticamente cuando tienen deudas pendientes.</p>
+  </div>
+  <div class="card table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Deuda Pendiente</th>
+          <th>Contacto</th>
+        </tr>
+      </thead>
+      <tbody id="tablaMorosos"></tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<button id="instalarBtn">📲 Instalar app</button>
+
+<script>
+let datos = JSON.parse(localStorage.getItem('mago_lector_data')) || {
+  materiales: [],
+  clientes: [],
+  ventas: [],
+  pagos: [],
+  productos: []
+};
+if (!datos.productos) datos.productos = [];
+let recetaEnConstruccion = [];
+
+function guardarDatos() {
+  localStorage.setItem('mago_lector_data', JSON.stringify(datos));
+  actualizarTodo();
+}
+
+function mostrarSeccion(id) {
+  document.querySelectorAll('main section').forEach(sec => sec.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('formProducto').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('productoNombre').value;
+    const precioVenta = parseFloat(document.getElementById('productoPrecioVenta').value);
+    const receta = recetaEnConstruccion.filter(f => f.materialId);
+    if (receta.length === 0) { alert('Agrega al menos un material'); return; }
+    datos.productos.push({ id: Date.now(), nombre, receta, precioVenta });
+    this.reset();
+    recetaEnConstruccion = [];
+    guardarDatos();
+  });
+
+  document.getElementById('formMaterial').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('materialNombre').value;
+    const costo = parseFloat(document.getElementById('materialCosto').value);
+    const stock = parseInt(document.getElementById('materialStock').value);
+    datos.materiales.push({ id: Date.now(), nombre, costo, stock });
+    this.reset();
+    guardarDatos();
+  });
+
+  document.getElementById('formCliente').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('clienteNombre').value;
+    const telefono = document.getElementById('clienteTelefono').value;
+    const correo = document.getElementById('clienteCorreo').value;
+    datos.clientes.push({ id: Date.now(), nombre, telefono, correo });
+    this.reset();
+    guardarDatos();
+  });
+
+  document.getElementById('formVenta').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const cliente = document.getElementById('ventaCliente').value;
+    const producto = document.getElementById('ventaProducto').value;
+    const cantidad = parseInt(document.getElementById('ventaCantidad').value);
+    const precio = parseFloat(document.getElementById('ventaPrecio').value);
+    const costo = parseFloat(document.getElementById('ventaCosto').value);
+    const pago = document.getElementById('ventaPago').value;
+    const fecha = new Date().toLocaleDateString();
+    datos.ventas.push({ id: Date.now(), fecha, cliente, producto, cantidad, precio, costo, pago });
+    this.reset();
+    guardarDatos();
+  });
+
+  document.getElementById('formPago').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const cliente = document.getElementById('pagoCliente').value;
+    const monto = parseFloat(document.getElementById('pagoMonto').value);
+    const metodo = document.getElementById('pagoMetodo').value;
+    const nota = document.getElementById('pagoNota').value;
+    const fecha = new Date().toLocaleDateString();
+    datos.pagos.push({ id: Date.now(), fecha, cliente, monto, metodo, nota });
+    this.reset();
+    guardarDatos();
+  });
+
+  actualizarTodo();
+});
+
+function eliminarMaterial(id) {
+  datos.materiales = datos.materiales.filter(m => m.id !== id);
+  guardarDatos();
+}
+
+function eliminarCliente(id) {
+  datos.clientes = datos.clientes.filter(c => c.id !== id);
+  guardarDatos();
+}
+
+function eliminarVenta(id) {
+  datos.ventas = datos.ventas.filter(v => v.id !== id);
+  guardarDatos();
+}
+
+function eliminarPago(id) {
+  datos.pagos = datos.pagos.filter(p => p.id !== id);
+  guardarDatos();
+}
+
+function agregarFilaReceta() {
+  recetaEnConstruccion.push({ materialId: '', cantidad: 1 });
+  renderFilasReceta();
+}
+function eliminarFilaReceta(i) { recetaEnConstruccion.splice(i,1); renderFilasReceta(); }
+function actualizarFilaReceta(i, campo, valor) {
+  recetaEnConstruccion[i][campo] = campo === 'cantidad' ? parseFloat(valor)||0 : valor;
+  actualizarCostoEstimado();
+}
+function renderFilasReceta() {
+  const cont = document.getElementById('filasReceta');
+  if (!cont) return;
+  cont.innerHTML = recetaEnConstruccion.map((f,i) => `
+    <div style="display:flex;gap:8px;margin-bottom:8px;">
+      <select style="flex:2;" onchange="actualizarFilaReceta(${i},'materialId',this.value)">
+        <option value="">-- Material --</option>
+        ${datos.materiales.map(m=>`<option value="${m.id}" ${f.materialId==m.id?'selected':''}>${m.nombre} ($${m.costo})</option>`).join('')}
+      </select>
+      <input type="number" min="0" step="0.01" style="flex:1;" value="${f.cantidad}" oninput="actualizarFilaReceta(${i},'cantidad',this.value)">
+      <button type="button" class="danger" onclick="eliminarFilaReceta(${i})">X</button>
+    </div>`).join('') || '<p class="empty">Agrega un material</p>';
+  actualizarCostoEstimado();
+}
+function calcularCostoReceta(receta) {
+  return receta.reduce((t,item)=>{
+    const m = datos.materiales.find(m=>m.id==item.materialId);
+    return t + (m ? m.costo*item.cantidad : 0);
+  },0);
+}
+function actualizarCostoEstimado() {
+  const costo = calcularCostoReceta(recetaEnConstruccion);
+  const precio = parseFloat(document.getElementById('productoPrecioVenta')?.value)||0;
+  const ganancia = precio - costo;
+  document.getElementById('previewCosto').innerText = `$${costo.toFixed(2)}`;
+  document.getElementById('previewGanancia').innerText = `$${ganancia.toFixed(2)}`;
+  document.getElementById('previewMargen').innerText = `${precio>0?((ganancia/precio)*100).toFixed(1):0}%`;
+}
+function eliminarProducto(id) { datos.productos = datos.productos.filter(p=>p.id!==id); guardarDatos(); }
+function seleccionarProductoCatalogo() {
+  const sel = document.getElementById('ventaProductoSelect');
+  const inputP = document.getElementById('ventaProducto');
+  const inputC = document.getElementById('ventaCosto');
+  const inputPr = document.getElementById('ventaPrecio');
+  if (sel.value === '' || sel.value === '__custom__') {
+    inputP.value=''; inputP.readOnly=false; inputC.readOnly=false; return;
+  }
+  const p = datos.productos.find(p=>p.id==sel.value);
+  if (p) {
+    inputP.value = p.nombre; inputP.readOnly = true;
+    inputC.value = calcularCostoReceta(p.receta).toFixed(2); inputC.readOnly = true;
+    inputPr.value = p.precioVenta;
+  }
+}
+
+function actualizarTodo() {
+  const selectVentaCliente = document.getElementById('ventaCliente');
+  const selectPagoCliente = document.getElementById('pagoCliente');
+  selectVentaCliente.innerHTML = '';
+  selectPagoCliente.innerHTML = '';
+
+  if (datos.clientes.length === 0) {
+    selectVentaCliente.innerHTML = '<option value="">Primero agrega un cliente</option>';
+    selectPagoCliente.innerHTML = '<option value="">Primero agrega un cliente</option>';
+  } else {
+    datos.clientes.forEach(c => {
+      selectVentaCliente.innerHTML += `<option value="${c.nombre}">${c.nombre}</option>`;
+      selectPagoCliente.innerHTML += `<option value="${c.nombre}">${c.nombre}</option>`;
+    });
+  }
+
+  const selProdVenta = document.getElementById('ventaProductoSelect');
+  const valPrevio = selProdVenta.value;
+  selProdVenta.innerHTML = '<option value="">-- Selecciona un producto del catálogo --</option><option value="__custom__">Producto personalizado</option>';
+  datos.productos.forEach(p => { selProdVenta.innerHTML += `<option value="${p.id}">${p.nombre}</option>`; });
+  selProdVenta.value = valPrevio;
+  renderFilasReceta();
+
+  let htmlProductos = '';
+  if (datos.productos.length === 0) {
+    htmlProductos = `<tr><td colspan="7" class="empty">No hay productos en el recetario.</td></tr>`;
+  } else {
+    datos.productos.forEach(p => {
+      const costo = calcularCostoReceta(p.receta);
+      const ganancia = p.precioVenta - costo;
+      const margen = p.precioVenta>0 ? ((ganancia/p.precioVenta)*100).toFixed(1) : '0';
+      const recetaTxt = p.receta.map(item => {
+        const m = datos.materiales.find(m=>m.id==item.materialId);
+        return m ? `${m.nombre} x${item.cantidad}` : 'material eliminado';
+      }).join(', ');
+      htmlProductos += `<tr>
+        <td>${p.nombre}</td><td>${recetaTxt}</td><td>$${costo.toFixed(2)}</td>
+        <td>$${p.precioVenta}</td><td>$${ganancia.toFixed(2)}</td><td>${margen}%</td>
+        <td><button type="button" class="danger" onclick="eliminarProducto(${p.id})">Eliminar</button></td>
+      </tr>`;
+    });
+  }
+  document.getElementById('tablaProductos').innerHTML = htmlProductos;
+
+  let htmlMat = '';
+  let totalCostosMat = 0;
+  if(datos.materiales.length === 0) {
+    htmlMat = `<tr><td colspan="5" class="empty">No hay materiales en el grimorio.</td></tr>`;
+  } else {
+    datos.materiales.forEach(m => {
+      let valorTotal = m.costo * m.stock;
+      totalCostosMat += valorTotal;
+      htmlMat += `<tr>
+        <td>${m.nombre}</td>
+        <td>$${m.costo}</td>
+        <td>${m.stock}</td>
+        <td>$${valorTotal}</td>
+        <td><button type="button" class="danger" onclick="eliminarMaterial(${m.id})">Eliminar</button></td>
+      </tr>`;
+    });
+  }
+  document.getElementById('tablaMateriales').innerHTML = htmlMat;
+
+  let totalVendido = 0;
+  let totalCostosVentas = 0;
+  let totalEfectivo = 0;
+  let totalTransferencias = 0;
+  let htmlVentas = '';
+
+  if(datos.ventas.length === 0) {
+    htmlVentas = `<tr><td colspan="9" class="empty">No hay ventas registradas.</td></tr>`;
+  } else {
+    datos.ventas.forEach(v => {
+      let totalV = v.cantidad * v.precio;
+      let totalC = v.cantidad * v.costo;
+      let gananciaV = totalV - totalC;
+
+      totalVendido += totalV;
+      totalCostosVentas += totalC;
+
+      if(v.pago === 'Efectivo') totalEfectivo += totalV;
+      if(v.pago === 'Transferencia') totalTransferencias += totalV;
+
+      htmlVentas += `<tr>
+        <td>${v.fecha}</td>
+        <td>${v.cliente}</td>
+        <td>${v.producto}</td>
+        <td>${v.cantidad}</td>
+        <td>$${totalV}</td>
+        <td>$${totalC}</td>
+        <td>$${gananciaV}</td>
+        <td><span class="badge ${v.pago === 'Pendiente' ? 'pending' : 'paid'}">${v.pago}</span></td>
+        <td><button type="button" class="danger" onclick="eliminarVenta(${v.id})">Eliminar</button></td>
+      </tr>`;
+    });
+  }
+  document.getElementById('tablaVentas').innerHTML = htmlVentas;
+
+  let htmlPagos = '';
+  if(datos.pagos.length === 0) {
+    htmlPagos = `<tr><td colspan="6" class="empty">No hay pagos registrados.</td></tr>`;
+  } else {
+    datos.pagos.forEach(p => {
+      if(p.metodo === 'Efectivo') totalEfectivo += p.monto;
+      if(p.metodo === 'Transferencia') totalTransferencias += p.monto;
+
+      htmlPagos += `<tr>
+        <td>${p.fecha}</td>
+        <td>${p.cliente}</td>
+        <td>$${p.monto}</td>
+        <td>${p.metodo}</td>
+        <td>${p.nota || '-'}</td>
+        <td><button type="button" class="danger" onclick="eliminarPago(${p.id})">Eliminar</button></td>
+      </tr>`;
+    });
+  }
+  document.getElementById('tablaPagos').innerHTML = htmlPagos;
+
+  let htmlClientes = '';
+  let htmlMorosos = '';
+  if(datos.clientes.length === 0) {
+    htmlClientes = `<tr><td colspan="9" class="empty">No hay clientes en el reino.</td></tr>`;
+    htmlMorosos = `<tr><td colspan="3" class="empty">No hay morosos en la lista negra.</td></tr>`;
+  } else {
+    datos.clientes.forEach(c => {
+      let comprasCliente = datos.ventas.filter(v => v.cliente === c.nombre);
+      let totalComp = comprasCliente.reduce((acc, v) => acc + (v.cantidad * v.precio), 0);
+      
+      let pagosCliente = datos.pagos.filter(p => p.cliente === c.nombre);
+      let totalPagado = pagosCliente.reduce((acc, p) => acc + p.monto, 0);
+
+      comprasCliente.forEach(v => {
+        if(v.pago !== 'Pendiente') {
+          totalPagado += (v.cantidad * v.precio);
+        }
+      });
+
+      let deuda = totalComp - totalPagado;
+      if(deuda < 0) deuda = 0;
+
+      let estadoBadge = deuda > 0 ? '<span class="badge pending">Deudor</span>' : '<span class="badge paid">Al día</span>';
+
+      htmlClientes += `<tr>
+        <td>${c.nombre}</td>
+        <td>${c.telefono || '-'}</td>
+        <td>${c.correo || '-'}</td>
+        <td>${comprasCliente.length}</td>
+        <td>$${totalComp}</td>
+        <td>$${totalPagado}</td>
+        <td>$${deuda}</td>
+        <td>${estadoBadge}</td>
+        <td><button type="button" class="danger" onclick="eliminarCliente(${c.id})">Eliminar</button></td>
+      </tr>`;
+
+      if(deuda > 0) {
+        htmlMorosos += `<tr>
+          <td>${c.nombre}</td>
+          <td><strong style="color: #fca5a5;">$${deuda}</strong></td>
+          <td>${c.telefono || c.correo || 'Sin contacto'}</td>
+        </tr>`;
+      }
+    });
+    if(htmlMorosos === '') {
+      htmlMorosos = `<tr><td colspan="3" class="empty">¡Maravilloso! Ningún cliente tiene deudas pendientes.</td></tr>`;
+    }
+  }
+  document.getElementById('tablaClientes').innerHTML = htmlClientes;
+  document.getElementById('tablaMorosos').innerHTML = htmlMorosos;
+
+  let gananciaTotal = totalVendido - totalCostosVentas;
+  document.getElementById('totalVendido').innerText = `$${totalVendido}`;
+  document.getElementById('totalCostos').innerText = `$${totalCostosVentas}`;
+  document.getElementById('ganancia').innerText = `$${gananciaTotal}`;
+  document.getElementById('cantidadVentas').innerText = datos.ventas.length;
+  document.getElementById('totalEfectivo').innerText = `$${totalEfectivo}`;
+  document.getElementById('totalTransferencias').innerText = `$${totalTransferencias}`;
+
+  const resumen = {};
+  datos.ventas.forEach(v => {
+    const clave = v.cliente + '|' + v.producto;
+    if (!resumen[clave]) resumen[clave] = { cliente:v.cliente, producto:v.producto, veces:0, cantidad:0, total:0 };
+    resumen[clave].veces += 1;
+    resumen[clave].cantidad += v.cantidad;
+    resumen[clave].total += v.cantidad * v.precio;
+  });
+  const filas = Object.values(resumen).sort((a,b)=>b.veces-a.veces);
+  document.getElementById('tablaHistorial').innerHTML = filas.length===0
+    ? `<tr><td colspan="5" class="empty">Aún no hay compras registradas.</td></tr>`
+    : filas.map(r=>`<tr><td>${r.cliente}</td><td>${r.producto}</td><td>${r.veces}</td><td>${r.cantidad}</td><td>$${r.total.toFixed(2)}</td></tr>`).join('');
+}
+
+// Registrar el service worker (necesario para poder instalar la app)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('Error SW:', err));
+  });
+}
+
+// Mostrar botón de instalación cuando el navegador lo permite (Android/Chrome)
+let promptInstalacion;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  promptInstalacion = e;
+  document.getElementById('instalarBtn').style.display = 'block';
+});
+
+document.getElementById('instalarBtn').addEventListener('click', async () => {
+  if (!promptInstalacion) return;
+  promptInstalacion.prompt();
+  await promptInstalacion.userChoice;
+  promptInstalacion = null;
+  document.getElementById('instalarBtn').style.display = 'none';
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('instalarBtn').style.display = 'none';
+});
+</script>
+
+</body>
+</html>
