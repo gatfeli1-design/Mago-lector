@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mago-lector-v1';
+const CACHE_NAME = 'mago-lector-v2';
 const ARCHIVOS = [
   './',
   './index.html',
